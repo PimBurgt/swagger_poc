@@ -1,0 +1,218 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "API voor het aanleveren van beheerdersinformatie",
+    "version": "2.0",
+    "title": "Validation Services"
+  },
+  "host": "localhost:34406",
+  "basePath": "/klic/validation-services/rest",
+  "tags": [
+    {
+      "name": "traceOpdeling"
+    },
+    {
+      "name": "polygoonValidatie"
+    },
+    {
+      "name": "aanvraagService"
+    },
+    {
+      "name": "aanvragen"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/aanvragen/gia": {
+      "post": {
+        "tags": [
+          "aanvragen"
+        ],
+        "summary": "Valideer of een aanvraag.json correct is gevuld.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "aanvraag",
+            "description": "Gebiedsinformatie aanvraag",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "geldig request",
+            "schema": {
+              "$ref": "#/definitions/AanvragerResponse"
+            }
+          },
+          "202": {
+            "description": "accepted",
+            "schema": {
+              "$ref": "#/definitions/AanvragerResponse"
+            }
+          },
+          "406": {
+            "description": "niet geaccepteerd/ongeldig request",
+            "schema": {
+              "$ref": "#/definitions/AanvragerResponse"
+            }
+          }
+        },
+        "x-camelContextId": "validationAPI",
+        "x-routeId": "authorized_indienen_aanvraag_post"
+      }
+    },
+    "/aanvragen/gia/{postId}/resultaat": {
+      "get": {
+        "tags": [
+          "aanvragen"
+        ],
+        "summary": "Ophalen status van gebiedsinformatie aanvraag(Async).",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Het postId van de aanvraag.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "geldig request",
+            "schema": {
+              "$ref": "#/definitions/AanvragerResponse"
+            }
+          },
+          "404": {
+            "description": "niet gevonden/not found",
+            "schema": {
+              "$ref": "#/definitions/AanvragerResponse"
+            }
+          }
+        },
+        "x-camelContextId": "validationAPI",
+        "x-routeId": "polling_aanvraag_async_external_get"
+      }
+    }
+  },
+  "definitions": {
+    "Belang": {
+      "type": "object",
+      "properties": {
+        "omschrijving": {
+          "type": "string"
+        },
+        "alleenInInformatiepolygoon": {
+          "type": "boolean"
+        },
+        "isBeheerderVeiligheidsgebied": {
+          "type": "boolean"
+        },
+        "themas": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contactAanvraag": {
+          "$ref": "#/definitions/Contactaanvraag"
+        }
+      }
+    },
+    "AanvragerResponse": {
+      "type": "object",
+      "properties": {
+        "postId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "giAanvraagId": {
+          "type": "string"
+        },
+        "pollUrl": {
+          "type": "string"
+        },
+        "validatiemeldingen": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Validatiemelding"
+          }
+        },
+        "belanghebbendeNetbeheerders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BelanghebbendeNetbeheerder"
+          }
+        }
+      },
+      "x-className": {
+        "type": "string",
+        "format": "nl.kadaster.klic.responsemodel.AanvragerResponse"
+      }
+    },
+    "BelanghebbendeNetbeheerder": {
+      "type": "object",
+      "properties": {
+        "organisatieNaam": {
+          "type": "string"
+        },
+        "belangen": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Belang"
+          }
+        }
+      }
+    },
+    "Contactaanvraag": {
+      "type": "object",
+      "properties": {
+        "naam": {
+          "type": "string"
+        },
+        "telefoon": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "Validatiemelding": {
+      "type": "object",
+      "properties": {
+        "positienummer": {
+          "type": "string"
+        },
+        "gradatie": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "omschrijving": {
+          "type": "string"
+        },
+        "jsonPointer": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
